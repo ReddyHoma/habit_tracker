@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'habit_tracker_screen.dart';
 import 'register_screen.dart';
@@ -7,6 +9,7 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _LoginScreenState createState() => _LoginScreenState();
 }
 
@@ -18,19 +21,36 @@ class _LoginScreenState extends State<LoginScreen> {
   final String defaultUsername = 'testuser';
   final String defaultPassword = 'password123';
 
-  void _login() {
-    // The login logic goes here
-    print("login logic here");
-
+  void _login() async {
     final username = _usernameController.text;
     final password = _passwordController.text;
 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Check against default credentials
     if (username == defaultUsername && password == defaultPassword) {
+      await prefs.setString('name', 'Test User');
+      await prefs.setString('username', 'testuser');
+      await prefs.setDouble('age', 25);
+      await prefs.setString('country', 'United States');
+
       Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(
           builder: (context) => HabitTrackerScreen(username: username),
         ),
+      );
+    } else {
+      //empty out shared preferences
+      await prefs.clear();
+      Fluttertoast.showToast(
+        msg: "The username or password was incorrect",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
       );
     }
   }
@@ -73,8 +93,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           Icon(Icons.email, color: Colors.blue.shade700),
                       hintText: 'Enter Username',
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 15),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                     ),
                   ),
                 ),
@@ -91,8 +111,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       prefixIcon: Icon(Icons.lock, color: Colors.blue.shade700),
                       hintText: 'Enter Password',
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 15),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                     ),
                   ),
                 ),
@@ -117,8 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 80, vertical: 15),
+                    padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
                   ),
                   child: const Text(
                     'Log in',
@@ -139,8 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const RegisterScreen()),
+                      MaterialPageRoute(builder: (context) => RegisterScreen()),
                     );
                   },
                   style: OutlinedButton.styleFrom(
@@ -148,8 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 70, vertical: 15),
+                    padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 15),
                   ),
                   child: const Text(
                     'Sign up',
